@@ -3,4 +3,4 @@ static/bootstrap*
 static/html5-qrcode
 Anleitung/
 config.py
-db/
+*.db
