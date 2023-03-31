@@ -1,85 +1,72 @@
-# TODO: enter as OK in barcode window ----- Testing
-# TODO: autofocus input fields ----- Testing
-# TODO: add additional window after trying to upload changes (ok and retry options) ----- Testing
-# TODO: create csv directory in start if needed 
-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g
 import csv 
 import datetime
 import os
-import time
+import sqlite3
 
 app = Flask(__name__)
 
 # load config
 app.config.from_object("config.DevelopmentConfig")
 
-def get_filename():
-    return "csv/" + datetime.datetime.now().strftime("%Y-%m-%d") + ".csv"
+# open a database connection if needed
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(
+            app.config['DB_PATH'],
+        )
+        #g.db.row_factory = sqlite3.Row
 
-# Create csv file for current day iff it doesnt exist already
-def init_csv():
-    file_name = get_filename()
-    header = ["BON", "Destination", "No. of recipient", "Amount", "Unit", "Date", "Time"]
-    if not os.path.exists(file_name):
-        with open(file_name, "a") as file:
-                writer = csv.writer(file)
-                writer.writerow(header)
+    return g.db
 
-# initialize csv on start
-init_csv()
+# close the database connection if needed
+def close_db(e=None):
+    db = g.pop('db', None)
 
-# Routes
-@app.route("/", methods=["GET"])
+    if db is not None:
+        db.close()
+
+
+#########################################
+############## Routes ###################
+#########################################
+
+# index
+@app.route("/wms/", methods=["GET"])
 def route_index():
-    return render_template("index.j2", size = app.config["SCANNER_BOX"])
+    return render_template("wms_index.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"])
 
+# stock
+@app.route("/wms/stock", methods=["GET"])
+def route_stock():
+    # retrieve data from db
+    db = get_db()
+    cur = db.cursor()
+    query = cur.execute("SELECT * from stock")
+    res = list(query)
 
-@app.route("/bookings/", methods=["POST"])
-def route_bookings():
+    # return data to client
+    return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
 
-    # check if fields exist 
-    data = request.get_json()
-    """
-    if "scanContent" not in data:
-        return "Missing data for bons or destinations", 400
+# csv import
+@app.route("/wms/import", methods=["GET", "POST"])
+def route_import():
+    if request.method == "GET":
+        return render_template("wms_import.j2")
+    elif request.method == "POST":
 
-    data = data["scanContent"]
-    """
-    if "bons" not in data or "destination" not in data or "recipients" not in data or "amounts" not in data or "units" not in data:
-        print(data)
-        return "Missing data", 400 
-
-    # fetch data from request
-    bons = data["bons"]
-    recipients = data["recipients"]
-    amounts = data["amounts"]
-    units = data["units"]
-    destination = data["destination"]
-
-    dt = datetime.datetime.now()
-    date = dt.strftime("%Y-%m-%d")
-    dtime = dt.strftime("%H-%M-%S")
-
-
-    # write to csv file
-    file_name = get_filename()
-    try :
-        with open(file_name, "a") as file:
-            for i in range(len(bons)):
-                bon = bons[i]
-                amount = amounts[i]
-                unit = units[i]
-                row = [bon, destination, recipients, amount, unit, date, dtime]
-                writer = csv.writer(file)
-                writer.writerow(row)
-
-        return "OK", 200
-    except PermissionError:
-        return "File is used!", 400
-
-
-
+        # csv file
+        body = request.data
+        
+        # no file found
+        if not body:
+            return "Error: Missing data", 400
+        
+        file = body.decode("utf-8")
+        
+        # TODO: INSERT into db
+        
+        return "Ok", 200
 
 # run the server (only development!)
 if __name__ == "__main__":

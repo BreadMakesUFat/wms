@@ -1,0 +1,43 @@
+
+@app.route("/bookings/", methods=["POST"])
+def route_bookings():
+
+    # check if fields exist 
+    data = request.get_json()
+    """
+    if "scanContent" not in data:
+        return "Missing data for bons or destinations", 400
+
+    data = data["scanContent"]
+    """
+    if "bons" not in data or "destination" not in data or "recipients" not in data or "amounts" not in data or "units" not in data:
+        print(data)
+        return "Missing data", 400 
+
+    # fetch data from request
+    bons = data["bons"]
+    recipients = data["recipients"]
+    amounts = data["amounts"]
+    units = data["units"]
+    destination = data["destination"]
+
+    dt = datetime.datetime.now()
+    date = dt.strftime("%Y-%m-%d")
+    dtime = dt.strftime("%H-%M-%S")
+
+
+    # write to csv file
+    file_name = get_filename()
+    try :
+        with open(file_name, "a") as file:
+            for i in range(len(bons)):
+                bon = bons[i]
+                amount = amounts[i]
+                unit = units[i]
+                row = [bon, destination, recipients, amount, unit, date, dtime]
+                writer = csv.writer(file)
+                writer.writerow(row)
+
+        return "OK", 200
+    except PermissionError:
+        return "File is used!", 400

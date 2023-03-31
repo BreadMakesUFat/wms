@@ -1,0 +1,4 @@
+- install all dependencies
+- create db directory
+- init db sql scripts
+- create config file 
