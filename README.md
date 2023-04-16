@@ -27,12 +27,11 @@
 - Reihenfolge Import csv Dateien vorgeschrieben
 - zusätzliche Felder werden ignoriert
 - BON MUSS EINDEUTIG SEIN!!!
-- ask for confirmation in create_database script
+- csv folder erstellen
 
-# Sonntag:
+# TODO:
 - Home Buttons
 - Bookings page + export + filters
 - Requests functionality
-- connect Barcode Scanner APP + adjust it
 - Anleitung
 - Install Scripts

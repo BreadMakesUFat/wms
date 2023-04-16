@@ -19,14 +19,14 @@ CREATE TABLE stock (
 );
 
 CREATE TABLE deliveries (
-    BON TEXT PRIMARY KEY, 
-    ArticleID TEXT NOT NULL,
+    ID INTEGER PRIMARY KEY,
+    BON TEXT, 
+    ArticleID TEXT,
     Destination TEXT NOT NULL, 
     Recipient INTEGER, 
     Amount TEXT, 
     Unit TEXT,
-    Date TEXT NOT NULL, 
-    Time TEXT NOT NULL
+    Date TEXT NOT NULL
 );
 
 COMMIT;

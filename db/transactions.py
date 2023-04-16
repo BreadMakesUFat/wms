@@ -74,3 +74,16 @@ class StockFilter:
         cur = db.cursor()
         res = cur.execute(self.query, tuple(self.params))
         return list(res)
+
+
+# Barcode Scanner
+def new_delivery(db, df):
+    df = df.reset_index(drop=True)
+
+    # insert into database
+    cur = db.cursor()
+    try:
+        df.to_sql(name="deliveries", con=db, if_exists="append", index=False)
+        return True, "No errors"
+    except Exception:
+        return False, "Error"

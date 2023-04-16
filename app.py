@@ -35,7 +35,53 @@ def close_db(exception):
 ############## Routes ###################
 #########################################
 
-# index
+# Barcode Scanner
+@app.route("/barcode/", methods=["GET"])
+def route_barcode_index():
+    return render_template("barcode_index.j2", size = app.config["SCANNER_BOX"])
+
+# Barcode bookings
+@app.route("/barcode/bookings/", methods=["POST"])
+def route_barcode_bookings():
+    # check if fields exist 
+    data = request.get_json()
+
+    if "bons" not in data or "destination" not in data or "recipients" not in data or "amounts" not in data or "units" not in data:
+        print(data)
+        return "Missing data", 400 
+
+    # fetch data from request
+    n = len(data["bons"])
+
+    bons = [""] * n 
+    articleIDs = [""] * n
+
+    for i,v in enumerate(data["bons"]):
+        if (v.startswith("AT")):
+            articleIDs[i] = v 
+        else:
+            bons[i] = v
+
+    d = {
+        "BON": bons,
+        "ArticleID": articleIDs,
+        "Destination": [data["destination"]] * n,
+        "Recipient": data["recipients"],
+        "Amount": data["amounts"],
+        "Unit": data["units"],
+        "Date": [datetime.datetime.now().strftime("%Y-%m-%d")] * n,
+    }
+
+    df = pd.DataFrame.from_dict(d)
+    db = get_db()
+    succ, err = transactions.new_delivery(db, df)
+
+    if succ:
+        return "OK", 200
+    else:
+        return "Err", 400
+
+# WMS index
 @app.route("/wms/", methods=["GET"])
 def route_index():
     return render_template("wms_index.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"])
@@ -116,23 +162,15 @@ def route_stock_filter():
 
 
 # stock
-@app.route("/wms/stock", methods=["GET", "POST"])
+@app.route("/wms/stock", methods=["GET"])
 def route_stock():
     # retrieve data from db
-        db = get_db()
-        res = transactions.get_stock(db)
+    db = get_db()
+    res = transactions.get_stock(db)
 
-        # return data to client
-        return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
-        # read filters
+    # return data to client
+    return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
         
-        body = request.json 
-
-        if not body:
-            return "Error: Missing data", 400
-        
-        
-
 
 # csv import
 @app.route("/wms/import", methods=["GET", "POST"])

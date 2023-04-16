@@ -1,0 +1,89 @@
+body {
+    background: rgb(20,14,119);
+    background: linear-gradient(90deg, rgba(20,14,119,0.7623249983587185) 0%, rgba(0,212,255,1) 100%); 
+}
+
+h1 {
+    text-align: center;
+}
+
+ul li {
+    list-style-type: none;
+}
+
+#outerWrapper {
+    display: inline;
+    width: 600px;
+    height: 900px;
+}
+
+#formWrapper {
+    margin: 0px auto;
+    display: table;
+    height: inherit;
+    width: inherit;
+}
+
+.Scene {
+    display: none;
+    vertical-align: middle;
+}
+
+#cameraScene {
+    background-color: white;
+    opacity: 0.8;
+}
+
+.textInput {
+    font-size: 40px;
+    resize: none;
+}
+
+.imgIcon {
+    border: 5px solid black;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.imageLabel {
+    font-size: 40px;
+    margin-bottom: 1px;
+}
+
+.pageLabel {
+    text-align: center;
+    font-size: 50px;
+}
+
+.pageSelect {
+    width: 400px;
+    font-size: 50px;
+    text-align: center;
+}
+
+.sceneText {
+    font-size: 40px;
+}
+
+.submitButton {
+    width: 150px;
+}
+
+.err {
+    /* Start the shake animation and make the animation last for 0.5 seconds */
+    animation: shake 0.5s;
+}
+  
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
