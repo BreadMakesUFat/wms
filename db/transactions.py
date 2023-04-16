@@ -27,7 +27,7 @@ def get_stock(db, params=("Date",)):
 def import_stock(db, file):
     # create dataframe from csv string
     csvStringIO = StringIO(file)
-    df = pd.read_csv(csvStringIO, sep=None)
+    df = pd.read_csv(csvStringIO, sep=None, decimal=",", thousands=".", engine="python", parse_dates=[4])
 
     # drop unused columns
     df = df.iloc[:,:len(SCHEMA_STOCK)-1]
@@ -39,7 +39,8 @@ def import_stock(db, file):
     # set schema
     df.columns = SCHEMA_STOCK.keys()
     df = df.reset_index(drop=True)
-    # df = df.astype(SCHEMA_STOCK)
+    df = df.astype(SCHEMA_STOCK)
+    df["BestBefore"] = df["BestBefore"].replace("NaT", None)
 
     # insert into database
     cur = db.cursor()
@@ -53,11 +54,9 @@ def import_stock(db, file):
 # Class for filter queries
 class StockFilter:
 
-    query = "SELECT * FROM stock WHERE 1 = 1"
-    params = []
-
     def __init__(self):
-        pass
+        self.query = "SELECT * FROM stock WHERE 1 = 1"
+        self.params = []
 
     def filterText(self, column, param):
         self.query += f" AND {column} LIKE ?"
@@ -68,16 +67,8 @@ class StockFilter:
         self.params.append(param)
 
     def filterDate(self, column, operator, date):
-        d = datetime.datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
         self.query += f" AND {column} {operator} ?"
-        self.params.append(d)
-
-    def filterDateRange(self, column, date1, date2):
-        d1 = datetime.datetime.strptime(date1, "%d.%m.%Y").strftime("%Y-%m-%d")
-        d2 = datetime.datetime.strptime(date2, "%d.%m.%Y").strftime("%Y-%m-%d")
-        self.query += f" AND {column} BETWEEN ? AND ?"
-        self.params.append(d1)
-        self.params.append(d2)
+        self.params.append(date)
 
     def execute(self, db):
         cur = db.cursor()

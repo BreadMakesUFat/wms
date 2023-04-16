@@ -31,10 +31,8 @@
 
 # Sonntag:
 - Home Buttons
-- Filters
-- Add Edit Buttons to table views
-- Bookings page
+- Bookings page + export + filters
+- Requests functionality
 - connect Barcode Scanner APP + adjust it
-- Design
-- Errors 
+- Anleitung
 - Install Scripts

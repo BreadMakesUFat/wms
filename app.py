@@ -10,7 +10,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # load config
-app.config.from_object("config.DevelopmentConfig")
+app.config.from_object("config.ProductionConfig")
 
 # open a database connection if needed
 def get_db():
@@ -40,20 +40,99 @@ def close_db(exception):
 def route_index():
     return render_template("wms_index.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"])
 
+@app.route("/wms/stock/filter", methods=["GET"])
+def route_stock_filter():
+    # get fields
+    articleID = request.args.get("articleID", None) 
+    articleDescription = request.args.get("articleDescription", None)
+    bon = request.args.get("bon", None)
+    boDescription = request.args.get("boDescription", None)
+    bestBefore1 = request.args.get("bestBefore1", None)
+    bestBefore2 = request.args.get("bestBefore2", None)
+    amount1 = request.args.get("amount1", None)
+    amount2 = request.args.get("amount2", None)
+    loc = request.args.get("loc", None)
+    weight1 = request.args.get("weight1", None)
+    weight2 = request.args.get("weight2", None)
+    unit = request.args.get("unit", None)
+    price1 = request.args.get("price1", None)
+    price2 = request.args.get("price2", None)
+    date1 = request.args.get("date1", None)
+    date2 = request.args.get("date2", None)
+
+    # parse
+    articleID = articleID + "%" if articleID else articleID
+    articleDescription = articleDescription + "%" if articleDescription else articleDescription
+    bon = bon + "%" if bon else bon 
+    boDescription = boDescription + "%" if boDescription else boDescription
+    amount1 = int(amount1) if amount1 else amount1
+    amount2 = int(amount2) if amount2 else amount2
+    loc = loc + "%" if loc else loc 
+    weight1 = float(weight1) if weight1 else weight1 
+    weight2 = float(weight2) if weight2 else weight2
+    price1 = float(price1) if price1 else price1
+    price2 = float(price2) if price2 else price2
+
+    # add filters
+    db = get_db()
+    filter = transactions.StockFilter()
+
+    if articleID:
+        filter.filterText("ArticleID", articleID)
+    if articleDescription:
+        filter.filterText("ArticleDescription", articleDescription)
+    if bon:
+        filter.filterText("BON", bon)
+    if boDescription:
+        filter.filterText("BODescription", boDescription)
+    if bestBefore1:
+        filter.filterDate("BestBefore", ">=", bestBefore1)
+    if bestBefore2:
+        filter.filterDate("BestBefore", "<=", bestBefore2)
+    if amount1:
+        filter.filterNumber("Amount", ">=", amount1)
+    if amount2:
+        filter.filterNumber("Amount", "<=", amount2)
+    if loc:
+        filter.filterText("Location", loc)
+    if weight1:
+        filter.filterNumber("Weight", ">=", weight1)
+    if weight2:
+        filter.filterNumber("Weight", "<=", weight2)
+    if unit:
+        filter.filterText("Unit", unit)
+    if price1:
+        filter.filterNumber("Price", ">=", price1)
+    if price2:
+        filter.filterNumber("Price", "<=", price2)
+    if date1:
+        filter.filterDate("Date", ">=", date1)
+    if date2:
+        filter.filterDate("Date", "<=", date2)
+
+    res = filter.execute(db)
+
+    return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
+
+
 # stock
 @app.route("/wms/stock", methods=["GET", "POST"])
 def route_stock():
-    if request.method == "GET":
-        # retrieve data from db
+    # retrieve data from db
         db = get_db()
         res = transactions.get_stock(db)
 
         # return data to client
         return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
-
-    elif request.method == "POST":
         # read filters
-        pass
+        
+        body = request.json 
+
+        if not body:
+            return "Error: Missing data", 400
+        
+        
+
 
 # csv import
 @app.route("/wms/import", methods=["GET", "POST"])

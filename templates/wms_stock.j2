@@ -81,7 +81,7 @@
     <center>
     <div class="mt-3 mb-5">
             <button id="ButtonReset" onclick="onReset()">Reset</button>
-            <button id="ButtonFilter">Search</button>
+            <button id="ButtonFilter" onclick="onSearch()">Search</button>
             <button id="ButtonExport" onclick="onExport()">Export</button>
     </div>
     </center>
@@ -135,6 +135,37 @@
         const date1 = document.getElementById("DateFilter1");
         const date2 = document.getElementById("DateFilter2");
 
+        // apply filters
+        function onSearch() {
+
+            data = {
+                articleID: articleID.value,
+                articleDescription: articleDescription.value,
+                bon: bon.value,
+                boDescription: boDescription.value,
+                bestBefore1: bestBefore1.value,
+                bestBefore2: bestBefore2.value,
+                amount1: amount1.value,
+                amount2: amount2.value,
+                loc: loc.value,
+                weight1: weight1.value,
+                weight2: weight2.value,
+                unit: unit.value,
+                price1: price1.value,
+                price2: price2.value,
+                date1: date1.value,
+                date2: date2.value
+            };
+
+            let address = "/wms/stock/filter?";
+            for (let key in data) {
+                if (data[key]) {
+                    address += `${key}=${data[key]}&`;
+                }
+            }
+            window.open(address, "_self");
+        }
+
         // reset filter fields
         function onReset() {
             articleID.value = "";
@@ -155,6 +186,7 @@
             date2.value = "";
         }
 
+        // export current table as csv
         function onExport() {
             // See: https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
             // Select rows from table_id
