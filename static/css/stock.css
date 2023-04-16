@@ -11,6 +11,10 @@ ul li {
     list-style-type: none;
 }
 
-table, th, td {
-    border: 1px solid;
+button {
+    width: 60px;
+}
+
+table {
+    width: 98%;
 }

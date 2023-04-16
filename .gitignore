@@ -2,5 +2,6 @@ __pycache__/
 static/bootstrap*
 static/html5-qrcode
 Anleitung/
+testing/
 config.py
 *.db

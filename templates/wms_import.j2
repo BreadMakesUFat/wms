@@ -37,12 +37,12 @@
         function onUpload() {
             fileObj = document.getElementById("csvFileUpload").files[0];
             if (fileObj) {
-                alert("file found!"); // TODO: preview/feedback for data
+                alert("file found!");
 
                 // enable submit button
                 document.getElementById("submitButton").disabled = false;
 
-                // preview first 10 rows of csv file
+                // TODO: preview first 10 rows of csv file
                 table = document.getElementById("csvPreviewTable");
                 let reader = new FileReader();
                 reader.readAsText(fileObj);

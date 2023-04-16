@@ -2,28 +2,31 @@ BEGIN;
 
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS deliveries;
+DROP TABLE IF EXISTS mappings;
 
 CREATE TABLE stock (
-    BON INTEGER PRIMARY KEY,
-    ID TEXT NOT NULL,
-    Description TEXT NOT NULL,
-    Batch TEXT NOT NULL,
-    BatchDescription TEXT, 
+    ArticleID TEXT NOT NULL,
+    ArticleDescription TEXT NOT NULL,
+    BON TEXT PRIMARY KEY,
+    BODescription TEXT,
     BestBefore TEXT,
-    Amount INTEGER NOT NULL, 
-    Unit TEXT NOT NULL, 
-    Weight INTEGER NOT NULL, 
-    Price TEXT NOT NULL
+    Amount INTEGER NOT NULL,
+    Location TEXT,
+    Weight REAL NOT NULL,
+    Unit TEXT NOT NULL,
+    Price REAL,
+    Date TEXT NOT NULL
 );
 
 CREATE TABLE deliveries (
-    ID TEXT PRIMARY KEY, 
-    BON INTEGER NOT NULL, 
-    Description TEXT NOT NULL,
-    Amount INTEGER NOT NULL, 
+    BON TEXT PRIMARY KEY, 
+    ArticleID TEXT NOT NULL,
     Destination TEXT NOT NULL, 
-    Batch TEXT NOT NULL
-    NumberPersons INTEGER NOT NULL
+    Recipient INTEGER, 
+    Amount TEXT, 
+    Unit TEXT,
+    Date TEXT NOT NULL, 
+    Time TEXT NOT NULL
 );
 
 COMMIT;

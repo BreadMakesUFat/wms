@@ -12,31 +12,181 @@
     <h1>{{ org_name ~ ' ' ~ org_id }}</h1>
     <h2>Stock</h2>
     <center>
-    <table>
-        <tr>
-            <th>BON</th>
-            <th>ID</th>
-            <th>Description</th>
-            <th>Batch</th>
-            <th>Batch Description</th>
-            <th>Best Before</th>
-            <th>Amout</th>
-            <th>Unit</th>
-            <th>Weight in kg</th>
-            <th>Price in Euro</th>
-        </tr>
-        {% for res in result %}
+    <div class="container" id="filters">
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Article ID</span>
+                    <input type="text" class="form-control" id="ArticleIDFilter">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Article Description</span>
+                    <input type="text" class="form-control" id="ArticleDescriptionFilter">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">BON</span>
+                    <input type="text" class="form-control" id="BONFilter">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">BO Description</span>
+                    <input type="text" class="form-control" id="BODescriptionFilter">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">BestBefore</span>
+                    <input type="date" class="form-control" id="BestBeforeFilter1">
+                    <span class="input-group-text"><=</span>
+                    <input type="date" class="form-control" id="BestBeforeFilter2">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Amount</span>
+                    <input type="text" class="form-control" id="AmountFilter1">
+                    <span class="input-group-text"><=</span>
+                    <input type="text" class="form-control" id="AmountFilter2">
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Location</span>
+                    <input type="text" class="form-control" id="LocationFilter">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Weight</span>
+                    <input type="text" class="form-control" id="WeightFilter1">
+                    <span class="input-group-text"><=</span>
+                    <input type="text" class="form-control" id="WeightFilter2">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Unit</span>
+                    <select class="form-select" id="UnitFilter">
+                        <option value=""></option>
+                        <option value="STÜCK">STÜCK</option>
+                        <option value="COLLI">COLLI</option>
+                    </select>
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Price</span>
+                    <input type="text" class="form-control" id="PriceFilter1">
+                    <span class="input-group-text"><=</span>
+                    <input type="text" class="form-control" id="PriceFilter2">
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">Date</span>
+                    <input type="date" class="form-control" id="DateFilter1">
+                    <span class="input-group-text"><=</span>
+                    <input type="date" class="form-control" id="DateFilter2">
+                </div>
+            </div>
+        </div>
+    </div>
+    <center>
+    <div class="mt-3 mb-5">
+            <button id="ButtonReset" onclick="onReset()">Reset</button>
+            <button id="ButtonFilter">Search</button>
+            <button id="ButtonExport" onclick="onExport()">Export</button>
+    </div>
+    </center>
+    </center>
+    <table class="table table-dark" id="dataTable">
+        <thead>
             <tr>
-                {% for col in res %}
-                    <td>{{ col }}</td>
-                {% endfor %}
+                <th scope="col">Article ID</th>
+                <th scope="col">Description</th>
+                <th scope="col">BON</th>
+                <th scope="col">BO Description</th>
+                <th scope="col">Best before</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Location</th>
+                <th scope="col">Weight (kg)</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Price in Euro</th>
+                <th scope="col">Date</th>
+                <th scope="col">Edit</th>
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for res in result %}
+                <tr>
+                    {% for col in res %}
+                        <td>{{ col }}</td>
+                    {% endfor %}
+                    <td><button>Edit</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
     
     </table>
-    </center>
        
     <script>
+
+        const articleID = document.getElementById("ArticleIDFilter");
+        const articleDescription = document.getElementById("ArticleDescriptionFilter");
+        const bon = document.getElementById("BONFilter");
+        const boDescription = document.getElementById("BODescriptionFilter");
+        const bestBefore1 = document.getElementById("BestBeforeFilter1");
+        const bestBefore2 = document.getElementById("BestBeforeFilter2");
+        const amount1 = document.getElementById("AmountFilter1");
+        const amount2 = document.getElementById("AmountFilter2");
+        const loc = document.getElementById("LocationFilter");
+        const weight1 = document.getElementById("WeightFilter1");
+        const weight2 = document.getElementById("WeightFilter2");
+        const unit = document.getElementById("UnitFilter");
+        const price1 = document.getElementById("PriceFilter1");
+        const price2 = document.getElementById("PriceFilter2");
+        const date1 = document.getElementById("DateFilter1");
+        const date2 = document.getElementById("DateFilter2");
+
+        // reset filter fields
+        function onReset() {
+            articleID.value = "";
+            articleDescription.value = "";
+            bon.value = "";
+            boDescription.value = "";
+            bestBefore1.value = "";
+            bestBefore2.value = "";
+            amount1.value = "";
+            amount2.value = "";
+            loc.value = "";
+            weight1.value = "";
+            weight2.value = "";
+            unit.value = "";
+            price1.value = "";
+            price2.value = "";
+            date1.value = "";
+            date2.value = "";
+        }
+
+        function onExport() {
+            // See: https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
+            // Select rows from table_id
+            const table_id = "dataTable";
+            const separator = ";";
+            var rows = document.querySelectorAll('table#' + table_id + ' tr');
+            // Construct csv
+            var csv = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll('td, th');
+                for (var j = 0; j < cols.length; j++) {
+                    // Clean innertext to remove multiple spaces and jumpline (break csv)
+                    var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+                    data = data.replace(/"/g, '""');
+                    // Push escaped string
+                    row.push('"' + data + '"');
+                }
+                csv.push(row.join(separator));
+            }
+            var csv_string = csv.join('\n');
+            // Download it
+            var filename = 'export_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+            var link = document.createElement('a');
+            link.style.display = 'none';
+            link.setAttribute('target', '_blank');
+            link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
     </script>
 </body>
 </html> 
