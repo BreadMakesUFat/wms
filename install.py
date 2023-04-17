@@ -33,7 +33,7 @@ def create_config():
             "   PORT = 8000\n", 
             "   DB_PATH = 'db/booking_test.db'\n", 
             "   ORG_NAME = 'GAiN'\n"
-            "   ORG_ID = 'Argenia'\n", 
+            "   ORG_ID = 'Armenia'\n", 
             "\n",
             "\n",
             "class ProductionConfig(object):\n",
@@ -44,7 +44,7 @@ def create_config():
             "   PORT = 8000\n", 
             "   DB_PATH = 'db/booking_test.db'\n", 
             "   ORG_NAME = 'GAiN'\n"
-            "   ORG_ID = 'Argenia'\n", 
+            "   ORG_ID = 'Armenia'\n", 
         ])
 
 
