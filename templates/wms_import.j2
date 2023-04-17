@@ -11,6 +11,10 @@
 <body>
     <h1>{{ org_name ~ ' ' ~ org_id }}</h1>
     <h2>Import csv</h2>
+
+    <div class="container mb-5">
+        <button id="btn btn-dark"><a href="/wms/">Home</a></button>
+    </div>
     
     <!-- File upload -->
     <center>
@@ -24,7 +28,7 @@
     <!-- CSV Preview -->
     <center>
     <div class="text-center mt-5">
-        <p id="csvPreviewTable"></p>
+        <p class="table table-dark" id="csvPreviewTable"></p>
     </div>
     </center>
     
@@ -48,7 +52,7 @@
                 reader.readAsText(fileObj);
                 reader.onload = () => {
                     let csv = reader.result;
-                    table.innerHTML = csv.split("\n")[0];
+                    table.innerHTML = csv.split("\n")[0].replaceAll(",", " | ").replaceAll(";", " | ");
                 }
                 
             }

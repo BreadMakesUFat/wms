@@ -27,7 +27,7 @@ def get_stock(db, params=("Date",)):
 def import_stock(db, file):
     # create dataframe from csv string
     csvStringIO = StringIO(file)
-    df = pd.read_csv(csvStringIO, sep=None, decimal=",", thousands=".", engine="python", parse_dates=[4])
+    df = pd.read_csv(csvStringIO, sep=None, decimal=",", thousands=".", engine="python", parse_dates=[4], dayfirst=True)
 
     # drop unused columns
     df = df.iloc[:,:len(SCHEMA_STOCK)-1]
@@ -87,3 +87,9 @@ def new_delivery(db, df):
         return True, "No errors"
     except Exception:
         return False, "Error"
+    
+def get_deliveries(db, params=("Key",)):
+    cur = db.cursor()
+    query = "SELECT * FROM deliveries ORDER BY ? DESC"
+    res = cur.execute(query, params)
+    return list(res)

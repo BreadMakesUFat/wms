@@ -212,15 +212,13 @@ def route_new_delivery():
             pass
         return "Ok", 200
     
-@app.route("/wms/deliveries", methods=["GET", "POST"])
+@app.route("/wms/deliveries", methods=["GET"])
 def route_deliveries():
-    if request.method == "GET":
-        return render_template("wms_deliveries.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result=None)
-    elif request.method == "POST":
-        # TOOD: handle filters + add result query to render_template
-        pass
+    db = get_db()
+    res = transactions.get_deliveries(db)
+    return render_template("wms_deliveries.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result=res)
 
-# run the server (only development!)
+# run the server (only development!) 
 if __name__ == "__main__":
     app.run(
         host = app.config["HOST"],

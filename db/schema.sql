@@ -24,9 +24,16 @@ CREATE TABLE deliveries (
     ArticleID TEXT,
     Destination TEXT NOT NULL, 
     Recipient INTEGER, 
-    Amount TEXT, 
+    Amount INTEGER, 
     Unit TEXT,
     Date TEXT NOT NULL
+);
+
+CREATE TABLE mappings (
+    ID INTEGER PRIMARY KEY,
+    ArticleID TEXT, 
+    FromUnit TEXT, 
+    Pieces INTEGER
 );
 
 COMMIT;

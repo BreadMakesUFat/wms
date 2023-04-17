@@ -30,8 +30,8 @@
 - csv folder erstellen
 
 # TODO:
-- Home Buttons
 - Bookings page + export + filters
 - Requests functionality
 - Anleitung
-- Install Scripts
+- Name: Froglog - Testrun Armenia
+- Icon?
