@@ -23,15 +23,8 @@
 - wsgi: waitress?
 
 
-# Wichtig:
-- Reihenfolge Import csv Dateien vorgeschrieben
-- zusätzliche Felder werden ignoriert
-- BON MUSS EINDEUTIG SEIN!!!
-- csv folder erstellen
-
 # TODO:
 - Bookings page + export + filters
 - Requests functionality
-- Anleitung
 - Name: Froglog - Testrun Armenia
 - Icon?

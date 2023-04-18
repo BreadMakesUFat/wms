@@ -114,11 +114,10 @@
                     {% for col in res %}
                         <td>{{ col }}</td>
                     {% endfor %}
-                    <td><button>Edit</button></td>
+                    <td><button type="button" onclick="onEdit({{ loop.index }})">Edit</button></td>
                 </tr>
             {% endfor %}
         </tbody>
-    
     </table>
        
     <script>
@@ -162,7 +161,7 @@
                 date2: date2.value
             };
 
-            let address = "/wms/stock/filter?";
+            let address = "/wms/stock?";
             for (let key in data) {
                 if (data[key]) {
                     address += `${key}=${data[key]}&`;
@@ -222,6 +221,31 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function onEdit(i) {
+
+            row = document.getElementById("dataTable").rows[i];
+
+            const fields = {
+                articleID: row.cells[0].innerHTML,
+                description: row.cells[1].innerHTML,
+                bon: row.cells[2].innerHTML,
+                boDescription: row.cells[3].innerHTML,
+                bestBefore: row.cells[4].innerHTML,
+                amount: row.cells[5].innerHTML,
+                loc: row.cells[6].innerHTML,
+                weight: row.cells[7].innerHTML,
+                unit: row.cells[8].innerHTML,
+                price: row.cells[9].innerHTML,
+                date: row.cells[10].innerHTML,
+            }
+
+            let address = "/wms/edit_stock?";
+            for (let key in fields) {
+                address += `${key}=${fields[key]}&`;
+            }
+            window.open(address, "_self");
         }
 
     </script>

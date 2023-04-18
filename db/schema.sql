@@ -22,6 +22,7 @@ CREATE TABLE deliveries (
     ID INTEGER PRIMARY KEY,
     BON TEXT, 
     ArticleID TEXT,
+    ArticleDescription TEXT,
     Destination TEXT NOT NULL, 
     Recipient INTEGER, 
     Amount INTEGER, 

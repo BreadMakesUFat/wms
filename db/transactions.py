@@ -49,7 +49,44 @@ def import_stock(db, file):
         return True, "No errors"
     except Exception:
         return False, "Error"
+    
+def edit_stock(db, values):
+    # build parameterized query
+    query = "UPDATE stock SET ArticleID = ?, ArticleDescription = ?, BODescription = ?, BestBefore = ?, Amount = ?, Location = ?, Weight = ?, Unit = ?, Price = ?, Date = ? WHERE BON = ?"
+    parameters = (
+        values["articleID"],
+        values["articleDescription"], 
+        values["boDescription"], 
+        values["bestBefore"], 
+        values["amount"], 
+        values["loc"], 
+        values["weight"], 
+        values["unit"], 
+        values["price"], 
+        values["date"], 
+        values["bon"]
+        )
+    # update database 
+    try:
+        db.execute(query, parameters)
+        db.commit()
+        return True 
+    except Exception as e:
+        print(e)
+        return False
 
+
+def delete_stock(db, bon):
+    query = "DELETE FROM stock WHERE BON = ?"
+    params = (bon,)
+
+    try:
+        db.execute(query, params)
+        db.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 # Class for filter queries
 class StockFilter:
@@ -74,7 +111,100 @@ class StockFilter:
         cur = db.cursor()
         res = cur.execute(self.query, tuple(self.params))
         return list(res)
+    
+# Deliveries
+class DeliveriesFilter:
 
+    def __init__(self):
+        self.query = "SELECT * FROM deliveries WHERE 1 = 1"
+        self.params = []
+
+    def filterText(self, column, param):
+        self.query += f" AND {column} LIKE ?"
+        self.params.append(param)
+
+    def filterNumber(self, column, operator, param):
+        self.query += f" AND {column} {operator} ?"
+        self.params.append(param)
+
+    def filterDate(self, column, operator, date):
+        self.query += f" AND {column} {operator} ?"
+        self.params.append(date)
+
+    def execute(self, db):
+        cur = db.cursor()
+        res = cur.execute(self.query, tuple(self.params))
+        return list(res)
+    
+def new_single_delivery(db, data):
+
+    cur = db.cursor()
+    bon = data["bon"]
+    articleID = data["articleID"]
+    
+    # bon is given
+    if bon:
+        res = cur.execute("SELECT ArticleID, ArticleDescription, Amount, Unit from stock WHERE BON = ?", (bon,)).fetchall()
+        if res:
+            data["articleID"] = res[0][0]
+            data["articleDescription"] = res[0][1]
+
+        else:
+            return False
+    
+    if articleID:
+        res = cur.execute("SELECT ArticleDescription from stock WHERE ArticleID = ?", (articleID,)).fetchall()
+        if res:
+            data["articleDescription"] = res[0][0]
+
+    query = "INSERT INTO deliveries (BON, ArticleID, ArticleDescription, Destination, Recipient, Amount, Unit, Date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    parameters = (
+        data["bon"],
+        data["articleID"],
+        data["articleDescription"],
+        data["destination"],
+        data["recipient"],
+        data["amount"],
+        data["unit"],
+        data["date"]
+    )
+
+    db.execute(query, parameters)
+    db.commit()
+    return True
+
+def edit_deliveries(db, data):
+    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, Date = ? WHERE ID = ?"
+    parameters = (
+        data["bon"],
+        data["articleID"],
+        data["articleDescription"],
+        data["destination"],
+        data["recipient"],
+        data["amount"],
+        data["unit"],
+        data["date"],
+        data["key"],
+    )
+    try:
+        db.execute(query, parameters)
+        db.commit()
+        return True 
+    except Exception as e:
+        print(e)
+        return False 
+    
+def delete_delivery(db, id):
+    query = "DELETE FROM deliveries WHERE ID = ?"
+    params = (id,)
+
+    try:
+        db.execute(query, params)
+        db.commit()
+        return True 
+    except Exception as e:
+        print(e)
+        return False
 
 # Barcode Scanner
 def new_delivery(db, df):

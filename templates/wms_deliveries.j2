@@ -34,6 +34,10 @@
                     <input type="text" class="form-control" id="ArticleIDFilter">
                 </div>
                 <div class="input-group mb-1">
+                    <span class="input-group-text">Article Description</span>
+                    <input type="text" class="form-control" id="ArticleDescriptionFilter">
+                </div>
+                <div class="input-group mb-1">
                     <span class="input-group-text">Destination</span>
                     <input type="text" class="form-control" id="DestinationFilter">
                 </div>
@@ -56,16 +60,15 @@
                 <span class="input-group-text">Unit</span>
                 <select class="form-select" id="UnitFilter">
                     <option value=""></option>
-                    <option value="Pieces">Pieces</option>
-                    <option value="Boxes">Boxes</option>
-                    <option value="kg">kg</option>
+                    <option value="COLLI">COLLI</option>
+                    <option value="STÜCK">STÜCK</option>
                 </select>
             </div>
             <div class="input-group mb-1">
                 <span class="input-group-text">Date</span>
-                <input type="text" class="form-control" id="DateFilter1">
+                <input type="date" class="form-control" id="DateFilter1">
                 <span class="input-group-text"><=</span>
-                <input type="text" class="form-control" id="DateFilter2">
+                <input type="date" class="form-control" id="DateFilter2">
             </div>
         </div>
     </div>
@@ -83,6 +86,7 @@
                 <th scope="col">Key</th>
                 <th scope="col">BON</th>
                 <th scope="col">Article ID</th>
+                <th scope="col">Article Description</th>
                 <th scope="col">Destination</th>
                 <th scope="col">Recipient</th>
                 <th scope="col">Amount</th>
@@ -97,13 +101,127 @@
                     {% for col in res %}
                         <td>{{ col }}</td>
                     {% endfor %}
-                    <td><button>Edit</button></td>
+                    <td><button type="button" onclick="onEdit({{ loop.index }})">Edit</button></td>
                 </tr>
             {% endfor %}
         </tbody>    
     </table>
        
     <script>
+
+        const key1 = document.getElementById("KeyFilter1");
+        const key2 = document.getElementById("KeyFilter2");
+        const bon = document.getElementById("BONFilter");
+        const articleID = document.getElementById("ArticleIDFilter");
+        const articleDescription = document.getElementById("ArticleDescriptionFilter");
+        const destination = document.getElementById("DestinationFilter");
+        const recipient1 = document.getElementById("RecipientFilter1");
+        const recipient2 = document.getElementById("RecipientFilter2");
+        const amount1 = document.getElementById("AmountFilter1");
+        const amount2 = document.getElementById("AmountFilter2");
+        const unit = document.getElementById("UnitFilter");
+        const date1 = document.getElementById("DateFilter1");
+        const date2 = document.getElementById("DateFilter2");
+
+        function onReset() {
+            key1.value = "";
+            key2.value = "";
+            bon.value = "";
+            articleID.value = "";
+            articleDescription.value = "";
+            destination.value = "";
+            recipient1.value = "";
+            recipient2.value = "";
+            amount1.value = "";
+            amount2.value = "";
+            unit.value = "";
+            date1.value = "";
+            date2.value = "";
+        }
+
+        // export current table as csv
+        function onExport() {
+            // See: https://stackoverflow.com/questions/15547198/export-html-table-to-csv-using-vanilla-javascript
+            // Select rows from table_id
+            const table_id = "dataTable";
+            const separator = ";";
+            var rows = document.querySelectorAll('table#' + table_id + ' tr');
+            // Construct csv
+            var csv = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll('td, th');
+                for (var j = 0; j < cols.length; j++) {
+                    // Clean innertext to remove multiple spaces and jumpline (break csv)
+                    var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+                    data = data.replace(/"/g, '""');
+                    // Push escaped string
+                    row.push('"' + data + '"');
+                }
+                csv.push(row.join(separator));
+            }
+            var csv_string = csv.join('\n');
+            // Download it
+            var filename = 'export_' + table_id + '_' + new Date().toLocaleDateString() + '.csv';
+            var link = document.createElement('a');
+            link.style.display = 'none';
+            link.setAttribute('target', '_blank');
+            link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function onSearch() {
+
+            data = {
+                key1: key1.value, 
+                key2: key2.value, 
+                bon: bon.value, 
+                articleID: articleID.value, 
+                articleDescription: articleDescription.value, 
+                destination: destination.value, 
+                recipient1: recipient1.value, 
+                recipient2: recipient2.value, 
+                amount1: amount1.value, 
+                amount2: amount2.value,
+                unit: unit.value, 
+                date1: date1.value, 
+                date2: date2.value
+            }
+
+            let address = "/wms/deliveries?";
+            for (let key in data) {
+                if (data[key]) {
+                    address += `${key}=${data[key]}&`;
+                }
+            }
+            window.open(address, "_self");
+        }
+
+        function onEdit(i) {
+
+            row = document.getElementById("dataTable").rows[i];
+
+            const fields = {
+                key: row.cells[0].innerHTML, 
+                bon: row.cells[1].innerHTML, 
+                articleID: row.cells[2].innerHTML, 
+                articleDescription: row.cells[3].innerHTML,
+                destination: row.cells[4].innerHTML,
+                recipient: row.cells[5].innerHTML, 
+                amount: row.cells[6].innerHTML,
+                unit: row.cells[7].innerHTML, 
+                date: row.cells[8].innerHTML
+            }
+
+            let address = "/wms/edit_deliveries?";
+            for (let key in fields) {
+                address += `${key}=${fields[key]}&`;
+            }
+            window.open(address, "_self");
+        }
+
     </script>
 </body>
 </html> 

@@ -19,32 +19,37 @@
     
     <!-- New delivery form -->
     <center>
-        <div id="container-sm">
+        <div class="container" width="600">
         <form>
-            <div class="form-group">
-                <label for="inputBON">BON/Article ID</label>
-                <input type="text" class="form-control" id="inputBON">
-            </div>
+            <div class="input-group mb-1">
+                <span class="input-group-text">BON/Article ID</span>
+                <input type="text" class="form-control" id="id">
+            </div> 
 
-            <div class="form-group">
-                <label for="inputDestination">Destination</label>
-                <input type="text" class="form-control" id="inputDestination">
-            </div>
+            <div class="input-group mb-1">
+                <span class="input-group-text">Destination</span>
+                <input type="text" class="form-control" id="destination">
+            </div> 
 
-            <div class="form-group">
-                <label for="inputNoRecipient">No. of recipient</label>
-                <input type="text" class="form-control" id="inputNoRecipient">
-            </div>
+            <div class="input-group mb-1">
+                <span class="input-group-text">No. of recipients</span>
+                <input type="text" class="form-control" id="recipient">
+            </div> 
 
-            <div class="form-group">
-                <label for="inputAmount">Amount</label>
-                <input type="text" class="form-control" id="inputAmount">
-                <select class="form-select" id="inputUnit" aria-label="Unit Selection">
-                    <option value="Pieces" selected>Pieces</option>
-                    <option value="Boxes">Boxes</option>
-                    <option value="KG">KG</option>
+            <div class="input-group mb-1">
+                <span class="input-group-text">Amount</span>
+                <input type="text" class="form-control" id="amount">
+            </div> 
+
+            <div class="input-group mb-1">
+                <span class="input-group-text">Unit</span>
+                <select class="form-select" id="unit">
+                    <option value=""></option>
+                    <option value="STÜCK">STÜCK</option>
+                    <option value="COLLI">COLLI</option>
                 </select>
             </div>
+
             
         </form>
          <button type="submit" class="btn btn-primary" id="buttonSubmit" onclick="onSubmitDelivery()">Ok</button>
@@ -57,22 +62,22 @@
         function onSubmitDelivery() {
 
             // TODO: read values and submit entry
-            let bon = document.getElementById("inputBON").value; 
-            let destination = document.getElementById("inputDestination").value; 
-            let recipient = document.getElementById("inputNoRecipient").value; 
-            let amount = document.getElementById("inputAmount").value; 
-            let unit = document.getElementById("inputUnit").value;
+            const id = document.getElementById("id").value; 
+            const destination = document.getElementById("destination").value; 
+            const recipient = document.getElementById("recipient").value; 
+            const amount = document.getElementById("amount").value; 
+            const unit = document.getElementById("unit").value;
 
-            if (!bon || !destination) {
+            if (!id || !destination) {
                 return;
             }
 
             const fields = {
-                b_bon: bon, 
-                b_dest: destination, 
-                b_rec: recipient,
-                b_amount: amount, 
-                b_unit: unit
+                id: id, 
+                destination: destination, 
+                recipient: recipient,
+                amount: amount, 
+                unit: unit
             };
 
             const content = {
@@ -83,10 +88,11 @@
                 body: JSON.stringify(fields)
             };
 
-            const response2 = fetch("/wms/new_delivery", content) 
+            const response2 = fetch("/wms/new_delivery/", content) 
                 .then(resp => {
                     if (resp.ok) {
                         alert("The request was successfull!");
+                        window.open("wms/deliveries/", "_self");
                     }
                     else {
                         alert("An error occured!");
