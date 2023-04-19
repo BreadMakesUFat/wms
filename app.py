@@ -115,7 +115,6 @@ def route_stock():
         # parse
         articleID = articleID + "%" if articleID else articleID
         articleDescription = articleDescription + "%" if articleDescription else articleDescription
-        bon = bon + "%" if bon else bon 
         boDescription = boDescription + "%" if boDescription else boDescription
         amount1 = int(amount1) if amount1 else amount1
         amount2 = int(amount2) if amount2 else amount2
@@ -124,6 +123,7 @@ def route_stock():
         weight2 = float(weight2) if weight2 else weight2
         price1 = float(price1) if price1 else price1
         price2 = float(price2) if price2 else price2
+
 
         # add filters
         db = get_db()
@@ -134,7 +134,14 @@ def route_stock():
         if articleDescription:
             filter.filterText("ArticleDescription", articleDescription)
         if bon:
-            filter.filterText("BON", bon)
+            if len(bon.split(",")) < 2:
+                bon = bon + "%" if bon else bon 
+                filter.filterText("BON", bon)
+            else:
+                bons = bon.split(",")
+                bons = [f"'{b.strip()}'" for b in bons]
+                bons = ",".join(bons)
+                filter.filterBons(bons)
         if boDescription:
             filter.filterText("BODescription", boDescription)
         if bestBefore1:
@@ -163,8 +170,13 @@ def route_stock():
             filter.filterDate("Date", "<=", date2)
 
         res = filter.execute(db)
+        res2 = [
+            sum([r["Amount"] if r["Amount"] else 0 for r in res]),
+            sum([r["Weight"] if r["Weight"] else 0 for r in res]),
+            sum([r["Price"] if r["Price"] else 0 for r in res])
+        ]
 
-        return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res)
+        return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res, sums = res2)
 
 @app.route("/wms/edit_stock/", methods=["GET", "POST"])
 def route_edit_stock():

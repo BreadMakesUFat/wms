@@ -3,6 +3,7 @@ BEGIN;
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS deliveries;
 DROP TABLE IF EXISTS mappings;
+DROP TABLE IF EXISTS articleTranslations;
 
 CREATE TABLE stock (
     ArticleID TEXT NOT NULL,
@@ -35,6 +36,13 @@ CREATE TABLE mappings (
     ArticleID TEXT, 
     FromUnit TEXT, 
     Pieces INTEGER
+);
+
+CREATE TABLE articleTranslations (
+    ArticleID TEXT PRIMARY KEY,
+    ArticleDescription TEXT, 
+    GovernmentCode TEXT, 
+    Unin TEXT 
 );
 
 COMMIT;

@@ -92,24 +92,36 @@ def delete_stock(db, bon):
 class StockFilter:
 
     def __init__(self):
-        self.query = "SELECT * FROM stock WHERE 1 = 1"
+        self.query1 = "SELECT * FROM stock WHERE 1 = 1"
+        self.query2 = "SELECT SUM(Amount), SUM(Weight), SUM(Price) FROM stock WHERE 1 = 1"
         self.params = []
 
     def filterText(self, column, param):
-        self.query += f" AND {column} LIKE ?"
+        s = f" AND {column} LIKE ?"
+        self.query1 += s
+        self.query2 += s
         self.params.append(param)
 
     def filterNumber(self, column, operator, param):
-        self.query += f" AND {column} {operator} ?"
+        s = f" AND {column} {operator} ?"
+        self.query1 += s
+        self.query2 += s
         self.params.append(param)
 
+    def filterBons(self, bons):
+        s = f" AND BON in ({bons})"
+        self.query1 += s
+        self.query2 += s
+
     def filterDate(self, column, operator, date):
-        self.query += f" AND {column} {operator} ?"
+        s = f" AND {column} {operator} ?"
+        self.query1 += s
+        self.query2 += s
         self.params.append(date)
 
     def execute(self, db):
         cur = db.cursor()
-        res = cur.execute(self.query, tuple(self.params))
+        res = cur.execute(self.query1, tuple(self.params))
         return list(res)
     
 # Deliveries
