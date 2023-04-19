@@ -41,8 +41,7 @@ CREATE TABLE mappings (
 CREATE TABLE articleTranslations (
     ArticleID TEXT PRIMARY KEY,
     ArticleDescription TEXT, 
-    GovernmentCode TEXT, 
-    Unin TEXT 
+    GovernmentCode TEXT
 );
 
 COMMIT;
