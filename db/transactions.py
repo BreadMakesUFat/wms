@@ -93,30 +93,28 @@ class StockFilter:
 
     def __init__(self):
         self.query1 = "SELECT * FROM stock WHERE 1 = 1"
-        self.query2 = "SELECT SUM(Amount), SUM(Weight), SUM(Price) FROM stock WHERE 1 = 1"
         self.params = []
 
     def filterText(self, column, param):
         s = f" AND {column} LIKE ?"
         self.query1 += s
-        self.query2 += s
         self.params.append(param)
 
     def filterNumber(self, column, operator, param):
         s = f" AND {column} {operator} ?"
         self.query1 += s
-        self.query2 += s
         self.params.append(param)
 
     def filterBons(self, bons):
-        s = f" AND BON in ({bons})"
+        p = ["?"] * len(bons)
+        p = ", ".join(p)
+        s = f" AND BON IN ({p})"
         self.query1 += s
-        self.query2 += s
+        self.params += bons
 
     def filterDate(self, column, operator, date):
         s = f" AND {column} {operator} ?"
         self.query1 += s
-        self.query2 += s
         self.params.append(date)
 
     def execute(self, db):
@@ -138,6 +136,13 @@ class DeliveriesFilter:
     def filterNumber(self, column, operator, param):
         self.query += f" AND {column} {operator} ?"
         self.params.append(param)
+
+    def filterBons(self, bons):
+        p = ["?"] * len(bons)
+        p = ", ".join(p)
+        s = f" AND BON IN ({p})"
+        self.query += s
+        self.params += bons
 
     def filterDate(self, column, operator, date):
         self.query += f" AND {column} {operator} ?"

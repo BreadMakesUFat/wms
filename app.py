@@ -139,8 +139,7 @@ def route_stock():
                 filter.filterText("BON", bon)
             else:
                 bons = bon.split(",")
-                bons = [f"'{b.strip()}'" for b in bons]
-                bons = ",".join(bons)
+                bons = [f"{b.strip()}" for b in bons]
                 filter.filterBons(bons)
         if boDescription:
             filter.filterText("BODescription", boDescription)
@@ -287,7 +286,6 @@ def route_deliveries():
     # parse 
     key1 = int(key1) if key1 else key1 
     key2 = int(key2) if key2 else key2
-    bon = bon + "%" if bon else bon 
     articleID = articleID + "%" if articleID else articleID
     articleDescription = articleDescription + "%" if articleDescription else articleDescription 
     destination = destination + "%" if destination else destination
@@ -306,7 +304,13 @@ def route_deliveries():
     if key2:
         filter.filterNumber("ID", "<=", key2)
     if bon:
-        filter.filterText("BON", bon)
+        if len(bon.split(",")) < 2:
+            bon = bon + "%" if bon else bon 
+            filter.filterText("BON", bon)
+        else:
+            bons = bon.split(",")
+            bons = [f"{b.strip()}" for b in bons]
+            filter.filterBons(bons)
     if articleID:
         filter.filterText("ArticleID", articleID)
     if articleDescription:
