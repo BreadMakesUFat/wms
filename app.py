@@ -223,8 +223,8 @@ def route_import():
         
         # decode data  
         try: 
-            file = body.decode("cp1252") 
-            # file = body.decode("utf-8")  
+            # file = body.decode("cp1252") 
+            file = body.decode("utf-8")  
 
             # append dataframe to database
             db = get_db()
