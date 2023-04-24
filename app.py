@@ -54,9 +54,9 @@ def route_barcode_bookings():
     # fetch data from request
     n = len(data["bons"])
 
-    bons = [""] * n 
-    articleIDs = [""] * n
-    articleDescriptions = [""] * n
+    bons = [None] * n 
+    articleIDs = [None] * n
+    articleDescriptions = [None] * n
 
     for i,v in enumerate(data["bons"]):
         if (v.startswith("AT")):

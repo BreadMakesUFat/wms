@@ -85,6 +85,7 @@
             <tr>
                 <th scope="col">Key</th>
                 <th scope="col">BON</th>
+                <th scope="col">BODescription</th>
                 <th scope="col">Article ID</th>
                 <th scope="col">Article Description</th>
                 <th scope="col">Article Description Translated</th>
@@ -214,17 +215,18 @@
             const fields = {
                 key: row.cells[0].innerHTML, 
                 bon: row.cells[1].innerHTML, 
-                articleID: row.cells[2].innerHTML, 
-                articleDescription: row.cells[3].innerHTML,
-                articleDescriptionTranslated: row.cells[4].innerHTML,
-                destination: row.cells[5].innerHTML,
-                recipient: row.cells[6].innerHTML, 
-                amount: row.cells[7].innerHTML,
-                unit: row.cells[8].innerHTML, 
-                unitTranslated: row.cells[9].innerHTML,
-                date: row.cells[10].innerHTML,
-                governmentCode: row.cells[11].innerHTML,
-                pricePerUnit: row.cells[12].innerHTML
+                boDescription: row.cells[2].innerHTML,
+                articleID: row.cells[3].innerHTML, 
+                articleDescription: row.cells[4].innerHTML,
+                articleDescriptionTranslated: row.cells[5].innerHTML,
+                destination: row.cells[6].innerHTML,
+                recipient: row.cells[7].innerHTML, 
+                amount: row.cells[8].innerHTML,
+                unit: row.cells[9].innerHTML, 
+                unitTranslated: row.cells[10].innerHTML,
+                date: row.cells[11].innerHTML,
+                governmentCode: row.cells[12].innerHTML,
+                pricePerUnit: row.cells[13].innerHTML
             }
 
             let address = "/wms/edit_deliveries?";

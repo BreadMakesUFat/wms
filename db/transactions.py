@@ -170,6 +170,7 @@ def new_single_delivery(db, data):
     articleID = data["articleID"]
 
     # set new columns
+    data["BODescription"] = None 
     data["ArticleDescriptionTranslated"] = None 
     data["UnitTranslated"] = translate_unit.get(data["unit"].upper().strip(), None)
     data["GovernmentCode"] = None
@@ -180,7 +181,7 @@ def new_single_delivery(db, data):
         if bon:
 
             # get article id, description, price
-            cur.execute("SELECT ArticleID, ArticleDescription, Amount, Price  from stock WHERE BON = ?", (bon,))
+            cur.execute("SELECT ArticleID, ArticleDescription, Amount, Price, BODescription  from stock WHERE BON = ?", (bon,))
             res = cur.fetchone()
             if res:
                 data["articleID"] = res[0]
@@ -189,6 +190,7 @@ def new_single_delivery(db, data):
                 price = float(res[3])
                 ppu = price / amount
                 data["PricePerUnit"] = ppu
+                data["BODescription"] = res[4]
             else:
                 print("the given bon does not have an existing articleID in stock!")
                 return False
@@ -225,9 +227,10 @@ def new_single_delivery(db, data):
 
 
         # write to db
-        query = "INSERT INTO deliveries (BON, ArticleID, ArticleDescription, ArticleDescriptionTranslated, Destination, Recipient, Amount, Unit, UnitTranslated, Date, GovernmentCode, PricePerUnit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO deliveries (BON, BODescription, ArticleID, ArticleDescription, ArticleDescriptionTranslated, Destination, Recipient, Amount, Unit, UnitTranslated, Date, GovernmentCode, PricePerUnit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         parameters = (
         data["bon"],
+        data["BODescription"],
         data["articleID"],
         data["articleDescription"],
         data["ArticleDescriptionTranslated"],
@@ -249,10 +252,12 @@ def new_single_delivery(db, data):
         print(e)
         return False
 
+# TODO: add bodescription
 def edit_deliveries(db, data):
-    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ?, PricePerUnit = ? WHERE ID = ?"
+    query = "UPDATE deliveries SET BON = ?, BODescription = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ?, PricePerUnit = ? WHERE ID = ?"
     parameters = (
         data["bon"],
+        data["boDescription"],
         data["articleID"],
         data["articleDescription"],
         data["articleDescriptionTranslated"],
@@ -291,6 +296,7 @@ def new_delivery(db, df):
     df = df.reset_index(drop=True)
 
     # add columns
+    df["BODescription"] = None 
     df["ArticleDescriptionTranslated"] = None 
     df["UnitTranslated"] = None 
     df["GovernmentCode"] = None 
@@ -303,7 +309,7 @@ def new_delivery(db, df):
             df.at[i, "UnitTranslated"] = translate_unit.get(row["Unit"].upper().strip(), None)
             # bon is given
             if row["BON"]:
-                query = "SELECT ArticleID, ArticleDescription, Amount, Price FROM stock WHERE BON = ?"
+                query = "SELECT ArticleID, ArticleDescription, Amount, Price, BODescription FROM stock WHERE BON = ?"
                 params = (row["BON"], )
                 cur = db.cursor()
                 cur.execute(query, params)
@@ -317,6 +323,7 @@ def new_delivery(db, df):
                     df.at[i, "ArticleDescription"] = articleDescription
                     ppu = price / amount 
                     df.at[i, "PricePerUnit"] = ppu 
+                    df.at[i, "BODescription"] = res[4]
                     # find translations 
                     query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
                     params = (articleID, )

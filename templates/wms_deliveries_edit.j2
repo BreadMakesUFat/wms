@@ -28,6 +28,10 @@
             <input type="text" class="form-control" id="bon" value="{{ fields['bon'] }}">
         </div>
         <div class="input-group mb-1">
+            <span class="input-group-text">BO Description</span>
+            <input type="text" class="form-control" id="boDescription" value="{{ fields['boDescription'] }}">
+        </div>
+        <div class="input-group mb-1">
             <span class="input-group-text">Article ID</span>
             <input type="text" class="form-control" id="articleID" value="{{ fields['articleID'] }}">
         </div>
@@ -85,6 +89,7 @@
             const fields = {
                 key: document.getElementById("key").value, 
                 bon: document.getElementById("bon").value,
+                boDescription: document.getElementById("boDescription").value,
                 articleID: document.getElementById("articleID").value,
                 articleDescription: document.getElementById("articleDescription").value,
                 articleDescriptionTranslated: document.getElementById("articleDescriptionTranslated").value,
