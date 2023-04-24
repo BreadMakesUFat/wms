@@ -35,13 +35,16 @@ if __name__ == "__main__":
             # bon is given
             if not row["BON"] == "None":
                 # find article id 
-                query = "SELECT ArticleID FROM stock WHERE BON = ?"
+                query = "SELECT ArticleID, ArticleDescription FROM stock WHERE BON = ?"
                 params = (row["BON"], )
                 cur = db.cursor()
                 cur.execute(query, params)
-                articleID = cur.fetchone()[0]
+                res = cur.fetchone()
+                articleID = res[0]
+                articleDescription = res[1]
                 if articleID:
                     df.at[i, "Article ID"] = articleID
+                    df.at[i, "Article Description"] = articleDescription
                     unit = translate_unit.get(row["Unit"].upper().strip(), None)
                     df.at[i, "UnitTranslated"] = unit
                     # find translations
@@ -56,8 +59,17 @@ if __name__ == "__main__":
                         df.at[i, "GovernmentCode"] = governmentCode
             #  only article id is given
             elif not row["Article ID"] == "None":
-                # find translations
                 articleID = row["Article ID"]
+                # find article description
+                query = "SELECT ArticleDescription FROM stock WHERE ArticleID = ?"
+                params = (articleID, )
+                cur = db.cursor()
+                cur.execute(query, params)
+                res = cur.fetchone()
+                if res:
+                    articleDescription = res[0]
+                    df.at[i, "Article Description"] = articleDescription
+                # find translations
                 unit = translate_unit.get(row["Unit"].upper().strip(), None)
                 df.at[i, "UnitTranslated"] = unit
                 query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"

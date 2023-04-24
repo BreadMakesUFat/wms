@@ -15,7 +15,12 @@ SCHEMA_STOCK = {
     "Unit": str, 
     "Price": float, 
     "Date": str
-    }
+}
+
+translate_unit = {
+    "STÜCK": "Կտոր",
+    "KG": "կգ"
+}
 
 # Stock
 def get_stock(db, params=("Date",)):
@@ -163,39 +168,86 @@ def new_single_delivery(db, data):
     cur = db.cursor()
     bon = data["bon"]
     articleID = data["articleID"]
-    
-    # bon is given
-    if bon:
-        res = cur.execute("SELECT ArticleID, ArticleDescription, Amount, Unit from stock WHERE BON = ?", (bon,)).fetchall()
-        if res:
-            data["articleID"] = res[0][0]
-            data["articleDescription"] = res[0][1]
 
-        else:
-            return False
-    
-    # TODO: get info (translations, articleID, pricePerUnit)
-    # TODO: subtract amount from database
-    if articleID:
-        res = cur.execute("SELECT ArticleDescription from stock WHERE ArticleID = ?", (articleID,)).fetchall()
-        if res:
-            data["articleDescription"] = res[0][0]
+    # set new columns
+    data["ArticleDescriptionTranslated"] = None 
+    data["UnitTranslated"] = translate_unit.get(data["unit"].upper().strip(), None)
+    data["GovernmentCode"] = None
+    data["PricePerUnit"] = None
 
-    query = "INSERT INTO deliveries (BON, ArticleID, ArticleDescription, Destination, Recipient, Amount, Unit, Date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-    parameters = (
+    try:
+        # bon is given
+        if bon:
+
+            # get article id, description, price
+            cur.execute("SELECT ArticleID, ArticleDescription, Amount, Price  from stock WHERE BON = ?", (bon,))
+            res = cur.fetchone()
+            if res:
+                data["articleID"] = res[0]
+                data["articleDescription"] = res[1]
+                amount = float(res[2])
+                price = float(res[3])
+                ppu = price / amount
+                data["PricePerUnit"] = ppu
+            else:
+                print("the given bon does not have an existing articleID in stock!")
+                return False
+            
+            # get translations
+            articleID = data.get("articleID", "")
+            cur.execute("SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?", (articleID, ))
+            res = cur.fetchone()
+            if res:
+                data["ArticleDescriptionTranslated"] = res[0]
+                data["GovernmentCode"] = res[1]
+    
+        # TODO: get info (translations, articleID, pricePerUnit)
+        # TODO: subtract amount from database
+        elif articleID:
+            cur.execute("SELECT ArticleDescription, Amount, Price from stock WHERE ArticleID = ?", (articleID,))
+            res = cur.fetchone()
+            if res:
+                data["articleDescription"] = res[0]
+                amount = float(res[1])
+                price = float(res[2])
+                ppu = price / amount
+                data["PricePerUnit"] = ppu 
+            # find translations 
+            query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
+            params = (articleID, )
+            cur.execute(query, params)
+            translations = cur.fetchone()
+            if translations:
+                articleDescription = translations[0]
+                governmentCode = translations[1]
+                data["ArticleDescriptionTranslated"] = articleDescription 
+                data["GovernmentCode"] = governmentCode
+
+
+        # write to db
+        query = "INSERT INTO deliveries (BON, ArticleID, ArticleDescription, ArticleDescriptionTranslated, Destination, Recipient, Amount, Unit, UnitTranslated, Date, GovernmentCode, PricePerUnit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        parameters = (
         data["bon"],
         data["articleID"],
         data["articleDescription"],
+        data["ArticleDescriptionTranslated"],
         data["destination"],
         data["recipient"],
         data["amount"],
         data["unit"],
-        data["date"]
-    )
+        data["UnitTranslated"],
+        data["date"],
+        data["GovernmentCode"],
+        data["PricePerUnit"]
+        )
 
-    db.execute(query, parameters)
-    db.commit()
-    return True
+        db.execute(query, parameters)
+        db.commit()
+        return True
+
+    except Exception as e:
+        print(e)
+        return False
 
 def edit_deliveries(db, data):
     query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ?, PricePerUnit = ? WHERE ID = ?"
@@ -238,13 +290,76 @@ def delete_delivery(db, id):
 def new_delivery(db, df):
     df = df.reset_index(drop=True)
 
-    # TODO: get info + subtract from db
-    # insert into database
-    cur = db.cursor()
+    # add columns
+    df["ArticleDescriptionTranslated"] = None 
+    df["UnitTranslated"] = None 
+    df["GovernmentCode"] = None 
+    df["PricePerUnit"] = None 
+
     try:
+
+        # iterate over all rows
+        for i,row in df.iterrows():
+            df.at[i, "UnitTranslated"] = translate_unit.get(row["Unit"].upper().strip(), None)
+            # bon is given
+            if row["BON"]:
+                query = "SELECT ArticleID, ArticleDescription, Amount, Price FROM stock WHERE BON = ?"
+                params = (row["BON"], )
+                cur = db.cursor()
+                cur.execute(query, params)
+                res = cur.fetchone()
+                articleID = res[0]
+                if articleID:
+                    articleDescription = res[1]
+                    amount = float(res[2])
+                    price = float(res[3])
+                    df.at[i, "ArticleID"] = articleID 
+                    df.at[i, "ArticleDescription"] = articleDescription
+                    ppu = price / amount 
+                    df.at[i, "PricePerUnit"] = ppu 
+                    # find translations 
+                    query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
+                    params = (articleID, )
+                    cur.execute(query, params)
+                    translations = cur.fetchone()
+                    if translations:
+                        articleDescription = translations[0]
+                        governmentCode = translations[1]
+                        df.at[i, "ArticleDescriptionTranslated"] = articleDescription 
+                        df.at[i, "GovernmentCode"] = governmentCode
+
+            elif row["ArticleID"]:
+                    articleID = row["ArticleID"]
+                    # find article description
+                    query = "SELECT ArticleDescription, Amount, Price FROM stock WHERE ArticleID = ?"
+                    params = (articleID, )
+                    cur = db.cursor()
+                    cur.execute(query, params)
+                    res = cur.fetchone()
+                    if res:
+                        articleDescription = res[0]
+                        amount = float(res[1])
+                        price = float(res[2])
+                        ppu = price / amount 
+                        df.at[i, "ArticleDescription"] = articleDescription
+                        df.at[i, "PricePerUnit"] = ppu
+                    # find translations
+                    query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
+                    params = (articleID, )
+                    cur.execute(query, params)
+                    translations = cur.fetchone()
+                    if translations:
+                        articleDescription = translations[0]
+                        governmentCode = translations[1]
+                        df.at[i, "ArticleDescriptionTranslated"] = articleDescription 
+                        df.at[i, "GovernmentCode"] = governmentCode
+
+
+        # add to deliveries
         df.to_sql(name="deliveries", con=db, if_exists="append", index=False)
         return True, "No errors"
-    except Exception:
+    except Exception as e:
+        print(e)
         return False, "Error"
     
 def get_deliveries(db, params=("Key",)):
