@@ -1,7 +1,7 @@
 import sqlite3
 
-DB_NAME = "booking_test.db"
-SCRIPT_PATH = "deliveries.sql"
+DB_NAME = "../booking_test.db"
+SCRIPT_PATH = "schema.sql"
 
 if __name__ == "__main__":
     with open(SCRIPT_PATH, "r") as f:
@@ -18,3 +18,4 @@ if __name__ == "__main__":
             print("Error initialising the database")
             if db is not None:
                 db.close()
+

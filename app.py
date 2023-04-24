@@ -222,7 +222,8 @@ def route_import():
             return "Error: Missing data", 400
         
         # decode data
-        file = body.decode("cp1252")      
+        file = body.decode("cp1252")    
+        # file = body.decode("utf-8")  
 
         # append dataframe to database
         db = get_db()

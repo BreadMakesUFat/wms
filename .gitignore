@@ -6,3 +6,5 @@ testing/
 config.py
 *.db
 data/
+*.csv
+*.xlsx

@@ -42,8 +42,13 @@ def import_stock(db, file):
     df = df.astype(SCHEMA_STOCK)
     df["BestBefore"] = df["BestBefore"].replace("NaT", None)
 
-    # insert into database
-    cur = db.cursor()
+    # replace "None" wit None 
+    df = df.replace("None", None)
+
+    # drop invalid rows w/o valid BON
+    # e.g.: export has summe column
+    df = df[df['ArticleID'] != "Summe"]
+
     try:
         df.to_sql(name="stock", con=db, if_exists="append", index=False)
         return True, "No errors"
@@ -191,16 +196,19 @@ def new_single_delivery(db, data):
     return True
 
 def edit_deliveries(db, data):
-    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, Date = ? WHERE ID = ?"
+    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ? WHERE ID = ?"
     parameters = (
         data["bon"],
         data["articleID"],
         data["articleDescription"],
+        data["articleDescriptionTranslated"],
         data["destination"],
         data["recipient"],
         data["amount"],
         data["unit"],
+        data["unitTranslated"],
         data["date"],
+        data["governmentCode"],
         data["key"],
     )
     try:

@@ -7,11 +7,14 @@ CREATE TABLE deliveries (
     BON TEXT, 
     ArticleID TEXT,
     ArticleDescription TEXT,
+    ArticleDescriptionTranslated TEXT, 
     Destination TEXT NOT NULL, 
     Recipient INTEGER, 
     Amount INTEGER, 
     Unit TEXT,
-    Date TEXT NOT NULL
+    UnitTranslated TEXT, 
+    Date TEXT NOT NULL,
+    GovernmentCode TEXT
 );
 
 COMMIT;

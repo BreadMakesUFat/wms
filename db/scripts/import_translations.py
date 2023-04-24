@@ -2,8 +2,8 @@ import pandas as pd
 import sqlite3
 
 
-file = "data/translations.xlsx"
-db_name = "booking_test.db"
+file = "../data/translations.xlsx"
+db_name = "../booking_test.db"
 db = None 
 
 if __name__ == "__main__":

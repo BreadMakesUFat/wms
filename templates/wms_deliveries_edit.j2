@@ -21,7 +21,7 @@
     <div class="container" id="dataTable" width="600">
         <div class="input-group mb-1">
             <span class="input-group-text">Key</span>
-            <input type="text" class="form-control" id="key" value="{{ fields['key'] }}">
+            <input type="text" class="form-control" id="key" value="{{ fields['key'] }}" readonly>
         </div>
         <div class="input-group mb-1">
             <span class="input-group-text">BON</span>
@@ -34,6 +34,10 @@
         <div class="input-group mb-1">
             <span class="input-group-text">Article Description</span>
             <input type="text" class="form-control" id="articleDescription" value="{{ fields['articleDescription'] }}">
+        </div>
+        <div class="input-group mb-1">
+            <span class="input-group-text">Article Description Translated</span>
+            <input type="text" class="form-control" id="articleDescriptionTranslated" value="{{ fields['articleDescriptionTranslated'] }}">
         </div>
         <div class="input-group mb-1">
             <span class="input-group-text">Destination</span>
@@ -52,8 +56,16 @@
             <input type="text" class="form-control" id="unit" value="{{ fields['unit'] }}">
         </div>
         <div class="input-group mb-1">
+            <span class="input-group-text">Unit Translated</span>
+            <input type="text" class="form-control" id="unitTranslated" value="{{ fields['unitTranslated'] }}">
+        </div>
+        <div class="input-group mb-1">
             <span class="input-group-text">Date</span>
             <input type="date" class="form-control" id="date" value="{{ fields['date'] }}">
+        </div>
+        <div class="input-group mb-1">
+            <span class="input-group-text">Government Code</span>
+            <input type="text" class="form-control" id="governmentCode" value="{{ fields['governmentCode'] }}">
         </div>
         <div class="container mb-1">
             <button type="button" class="btn btn-dark" onclick="onSave()">Save</button>
@@ -71,11 +83,14 @@
                 bon: document.getElementById("bon").value,
                 articleID: document.getElementById("articleID").value,
                 articleDescription: document.getElementById("articleDescription").value,
+                articleDescriptionTranslated: document.getElementById("articleDescriptionTranslated").value,
                 destination: document.getElementById("destination").value,
                 recipient: document.getElementById("recipient").value,
                 amount: document.getElementById("amount").value,
                 unit: document.getElementById("unit").value,
+                unitTranslated: document.getElementById("unitTranslated").value,
                 date: document.getElementById("date").value,
+                governmentCode: document.getElementById("governmentCode").value
             }
 
             // content of the post request
