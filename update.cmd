@@ -1,2 +1,2 @@
-git reset --heard HEAD 
+git reset --hard HEAD 
 git pull 
