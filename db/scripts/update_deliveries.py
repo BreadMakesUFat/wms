@@ -24,6 +24,7 @@ if __name__ == "__main__":
         df["ArticleDescriptionTranslated"] = None 
         df["UnitTranslated"] = None 
         df["GovernmentCode"] = None 
+        df["PricePerUnit"] = None 
         
 
         # connect to db
@@ -81,7 +82,7 @@ if __name__ == "__main__":
         })
         df = df.reset_index(drop=True)
         df = df.replace("None", None)
-        df = df[["ID", "BON", "ArticleID", "ArticleDescription", "ArticleDescriptionTranslated", "Destination", "Recipient", "Amount", "Unit", "UnitTranslated", "Date", "GovernmentCode"]]
+        df = df[["ID", "BON", "ArticleID", "ArticleDescription", "ArticleDescriptionTranslated", "Destination", "Recipient", "Amount", "Unit", "UnitTranslated", "Date", "GovernmentCode", "PricePerUnit"]]
 
         # Insert into deliveries table
         df.to_sql(name="deliveries", con=db, if_exists="replace", index=False)

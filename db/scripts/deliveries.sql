@@ -14,7 +14,8 @@ CREATE TABLE deliveries (
     Unit TEXT,
     UnitTranslated TEXT, 
     Date TEXT NOT NULL,
-    GovernmentCode TEXT
+    GovernmentCode TEXT,
+    PricePerUnit REAL
 );
 
 COMMIT;

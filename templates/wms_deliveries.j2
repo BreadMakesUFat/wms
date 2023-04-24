@@ -95,6 +95,7 @@
                 <th scope="col">Unit Translated</th>
                 <th scope="col">Date</th>
                 <th scope="col">Government Code</th>
+                <th scope="col">Price Per Unit</th>
                 <th scope="col">Edit</th>
             </tr>
         </thead>
@@ -157,6 +158,10 @@
                     // Clean innertext to remove multiple spaces and jumpline (break csv)
                     var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
                     data = data.replace(/"/g, '""');
+                    // edit: change decimal to comma
+                    if (j == 12) {
+                        data = data.replace(".", ",");
+                    }
                     // Push escaped string
                     row.push('"' + data + '"');
                 }
@@ -218,7 +223,8 @@
                 unit: row.cells[8].innerHTML, 
                 unitTranslated: row.cells[9].innerHTML,
                 date: row.cells[10].innerHTML,
-                governmentCode: row.cells[11].innerHTML
+                governmentCode: row.cells[11].innerHTML,
+                pricePerUnit: row.cells[12].innerHTML
             }
 
             let address = "/wms/edit_deliveries?";

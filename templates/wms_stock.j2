@@ -224,6 +224,10 @@
                     // Clean innertext to remove multiple spaces and jumpline (break csv)
                     var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
                     data = data.replace(/"/g, '""');
+                    // edit: change decimal delimiter to comma
+                    if (j == 7 || j == 9) {
+                        data = data.replace(".", ",");
+                    }
                     // Push escaped string
                     row.push('"' + data + '"');
                 }

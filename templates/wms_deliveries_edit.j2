@@ -67,6 +67,10 @@
             <span class="input-group-text">Government Code</span>
             <input type="text" class="form-control" id="governmentCode" value="{{ fields['governmentCode'] }}">
         </div>
+        <div class="input-group mb-1">
+            <span class="input-group-text">Price Per Unit</span>
+            <input type="text" class="form-control" id="pricePerUnit" value="{{ fields['pricePerUnit'] }}">
+        </div>
         <div class="container mb-1">
             <button type="button" class="btn btn-dark" onclick="onSave()">Save</button>
             <button type="button" class="btn btn-dark" onclick="onDelete()">Delete Entry</button>
@@ -90,7 +94,8 @@
                 unit: document.getElementById("unit").value,
                 unitTranslated: document.getElementById("unitTranslated").value,
                 date: document.getElementById("date").value,
-                governmentCode: document.getElementById("governmentCode").value
+                governmentCode: document.getElementById("governmentCode").value,
+                pricePerUnit: document.getElementById("pricePerUnit").value
             }
 
             // content of the post request

@@ -222,18 +222,22 @@ def route_import():
             return "Error: Missing data", 400
         
         # decode data
-        file = body.decode("cp1252")    
-        # file = body.decode("utf-8")  
+        # file = body.decode("cp1252")   
+        try: 
+            file = body.decode("utf-8")  
 
-        # append dataframe to database
-        db = get_db()
-        ok, err = transactions.import_stock(db, file)
-        
-        # response to client
-        if ok:
-            return "Ok", 200
-        else:
-            return "An error occured. The file might contain BON ids that are already used!", 400
+            # append dataframe to database
+            db = get_db()
+            ok, err = transactions.import_stock(db, file)
+            
+            # response to client
+            if ok:
+                return "Ok", 200
+            else:
+                return "An error occured. The file might contain BON ids that are already used!", 400
+        except Exception as e:
+            print(e)
+            return "An error occured. The file might have the wrong encoding. The import expects utf-8 encoding!", 400
     
 @app.route("/wms/new_delivery/", methods=["GET", "POST"])
 def route_new_delivery():

@@ -174,6 +174,8 @@ def new_single_delivery(db, data):
         else:
             return False
     
+    # TODO: get info (translations, articleID, pricePerUnit)
+    # TODO: subtract amount from database
     if articleID:
         res = cur.execute("SELECT ArticleDescription from stock WHERE ArticleID = ?", (articleID,)).fetchall()
         if res:
@@ -196,7 +198,7 @@ def new_single_delivery(db, data):
     return True
 
 def edit_deliveries(db, data):
-    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ? WHERE ID = ?"
+    query = "UPDATE deliveries SET BON = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ?, PricePerUnit = ? WHERE ID = ?"
     parameters = (
         data["bon"],
         data["articleID"],
@@ -209,6 +211,7 @@ def edit_deliveries(db, data):
         data["unitTranslated"],
         data["date"],
         data["governmentCode"],
+        data["pricePerUnit"],
         data["key"],
     )
     try:
@@ -235,6 +238,7 @@ def delete_delivery(db, id):
 def new_delivery(db, df):
     df = df.reset_index(drop=True)
 
+    # TODO: get info + subtract from db
     # insert into database
     cur = db.cursor()
     try:
