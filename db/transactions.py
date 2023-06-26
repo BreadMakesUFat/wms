@@ -186,10 +186,8 @@ def new_single_delivery(db, data):
             if res:
                 data["articleID"] = res[0]
                 data["articleDescription"] = res[1]
-                amount = float(res[2])
-                price = float(res[3])
-                ppu = price / amount
-                data["PricePerUnit"] = ppu
+                price = res[3]
+                data["PricePerUnit"] = price
                 data["BODescription"] = res[4]
             else:
                 print("the given bon does not have an existing articleID in stock!")
@@ -203,18 +201,16 @@ def new_single_delivery(db, data):
                 data["ArticleDescriptionTranslated"] = res[0]
                 data["GovernmentCode"] = res[1]
     
-        # TODO: get info (translations, articleID, pricePerUnit)
-        # TODO: subtract amount from database
+        # get info
         elif articleID:
-            cur.execute("SELECT ArticleDescription, BON, Amount, Price from stock WHERE ArticleID = ?", (articleID,))
+            cur.execute("SELECT ArticleDescription, BON, BODescription, Amount, Price from stock WHERE ArticleID = ?", (articleID,))
             res = cur.fetchone()
             if res:
                 data["articleDescription"] = res[0]
                 data["bon"] = res[1]
-                amount = float(res[2])
-                price = float(res[3])
-                ppu = price / amount
-                data["PricePerUnit"] = ppu 
+                data["BODescription"] = res[2]
+                price = res[4]
+                data["PricePerUnit"] = price
             else:
                 print("the given article id does not exist in stock!")
                 return False
@@ -265,7 +261,7 @@ def new_single_delivery(db, data):
         print(e)
         return False
 
-# TODO: add bodescription
+
 def edit_deliveries(db, data):
     query = "UPDATE deliveries SET BON = ?, BODescription = ?, ArticleID = ?, ArticleDescription = ?, ArticleDescriptionTranslated = ?, Destination = ?, Recipient = ?, Amount = ?, Unit = ?, UnitTranslated = ?, Date = ?, GovernmentCode = ?, PricePerUnit = ? WHERE ID = ?"
     parameters = (
@@ -330,12 +326,10 @@ def new_delivery(db, df):
                 if res:
                     articleID = res[0]
                     articleDescription = res[1]
-                    amount = float(res[2])
-                    price = float(res[3])
+                    price = res[3]
                     df.at[i, "ArticleID"] = articleID 
                     df.at[i, "ArticleDescription"] = articleDescription
-                    ppu = price / amount 
-                    df.at[i, "PricePerUnit"] = ppu 
+                    df.at[i, "PricePerUnit"] = price
                     df.at[i, "BODescription"] = res[4]
                     # find translations 
                     query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
@@ -351,7 +345,7 @@ def new_delivery(db, df):
             elif row["ArticleID"]:
                     articleID = row["ArticleID"]
                     # find article description
-                    query = "SELECT ArticleDescription, BON, Amount, Price FROM stock WHERE ArticleID = ?"
+                    query = "SELECT ArticleDescription, BON, BODescription, Amount, Price FROM stock WHERE ArticleID = ?"
                     params = (articleID, )
                     cur = db.cursor()
                     cur.execute(query, params)
@@ -359,11 +353,10 @@ def new_delivery(db, df):
                     if res:
                         articleDescription = res[0]
                         df.at[i, "BON"] = res[1]
-                        amount = float(res[2])
-                        price = float(res[3])
-                        ppu = price / amount 
+                        df.at[i, "BODescription"] = res[2]
+                        price = res[4]
                         df.at[i, "ArticleDescription"] = articleDescription
-                        df.at[i, "PricePerUnit"] = ppu
+                        df.at[i, "PricePerUnit"] = price
                     # find translations
                     query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
                     params = (articleID, )

@@ -172,7 +172,7 @@ def route_stock():
         res2 = [
             sum([r["Amount"] if r["Amount"] else 0 for r in res]),
             sum([r["Weight"] if r["Weight"] else 0 for r in res]),
-            sum([r["Price"] if r["Price"] else 0 for r in res])
+            sum([r["Price"] * r["Amount"] if r["Price"] and r["Amount"] else 0 for r in res])
         ]
 
         return render_template("wms_stock.j2", org_name = app.config["ORG_NAME"], org_id = app.config["ORG_ID"], result = res, sums = res2)
@@ -255,7 +255,7 @@ def route_new_delivery():
         
         # parse id 
         id = data["id"]
-        if v.startswith("AT") or v.endswith("N") or v.endswith("U") or v.endswith("B"):
+        if id.startswith("AT") or id.endswith("N") or id.endswith("U") or id.endswith("B"):
             data["articleID"] = id 
             data["bon"] = None 
         else:
