@@ -206,14 +206,18 @@ def new_single_delivery(db, data):
         # TODO: get info (translations, articleID, pricePerUnit)
         # TODO: subtract amount from database
         elif articleID:
-            cur.execute("SELECT ArticleDescription, Amount, Price from stock WHERE ArticleID = ?", (articleID,))
+            cur.execute("SELECT ArticleDescription, BON, Amount, Price from stock WHERE ArticleID = ?", (articleID,))
             res = cur.fetchone()
             if res:
                 data["articleDescription"] = res[0]
-                amount = float(res[1])
-                price = float(res[2])
+                data["bon"] = res[1]
+                amount = float(res[2])
+                price = float(res[3])
                 ppu = price / amount
                 data["PricePerUnit"] = ppu 
+            else:
+                print("the given article id does not exist in stock!")
+                return False
             # find translations 
             query = "SELECT ArticleDescription, GovernmentCode FROM articleTranslations WHERE ArticleID = ?"
             params = (articleID, )
@@ -226,7 +230,16 @@ def new_single_delivery(db, data):
                 data["GovernmentCode"] = governmentCode
 
 
-        # write to db
+        # subtract from stock
+        query = "UPDATE stock SET Amount = Amount - ? WHERE BON = ?"
+        parameters = (
+            data["amount"],
+            data["bon"]
+        )
+
+        db.execute(query, parameters)
+
+        # write to deliveries table
         query = "INSERT INTO deliveries (BON, BODescription, ArticleID, ArticleDescription, ArticleDescriptionTranslated, Destination, Recipient, Amount, Unit, UnitTranslated, Date, GovernmentCode, PricePerUnit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         parameters = (
         data["bon"],
@@ -314,8 +327,8 @@ def new_delivery(db, df):
                 cur = db.cursor()
                 cur.execute(query, params)
                 res = cur.fetchone()
-                articleID = res[0]
-                if articleID:
+                if res:
+                    articleID = res[0]
                     articleDescription = res[1]
                     amount = float(res[2])
                     price = float(res[3])
@@ -338,15 +351,16 @@ def new_delivery(db, df):
             elif row["ArticleID"]:
                     articleID = row["ArticleID"]
                     # find article description
-                    query = "SELECT ArticleDescription, Amount, Price FROM stock WHERE ArticleID = ?"
+                    query = "SELECT ArticleDescription, BON, Amount, Price FROM stock WHERE ArticleID = ?"
                     params = (articleID, )
                     cur = db.cursor()
                     cur.execute(query, params)
                     res = cur.fetchone()
                     if res:
                         articleDescription = res[0]
-                        amount = float(res[1])
-                        price = float(res[2])
+                        df.at[i, "BON"] = res[1]
+                        amount = float(res[2])
+                        price = float(res[3])
                         ppu = price / amount 
                         df.at[i, "ArticleDescription"] = articleDescription
                         df.at[i, "PricePerUnit"] = ppu
@@ -360,6 +374,17 @@ def new_delivery(db, df):
                         governmentCode = translations[1]
                         df.at[i, "ArticleDescriptionTranslated"] = articleDescription 
                         df.at[i, "GovernmentCode"] = governmentCode
+
+
+        # subtract amount from stock
+        for i,row in df.iterrows():
+            params = (
+                row["Amount"],
+                row["BON"]
+            )
+            query = "UPDATE stock SET Amount = Amount - ? WHERE BON = ?"
+            db.execute(query, params)
+        db.commit()
 
 
         # add to deliveries

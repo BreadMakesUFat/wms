@@ -44,9 +44,7 @@
             <div class="input-group mb-1">
                 <span class="input-group-text">Unit</span>
                 <select class="form-select" id="unit">
-                    <option value=""></option>
                     <option value="STÜCK">STÜCK</option>
-                    <option value="kg">kg</option>
                 </select>
             </div>
 
@@ -68,7 +66,7 @@
             const amount = document.getElementById("amount").value; 
             const unit = document.getElementById("unit").value;
 
-            if (!id || !destination) {
+            if (!id || !destination || !amount) {
                 return;
             }
 
@@ -95,7 +93,7 @@
                         window.open("/wms/deliveries/", "_self");
                     }
                     else {
-                        alert("An error occured!");
+                        alert("An error occured! The BON/Article ID might not exist in the database.");
                     }
                 }
             );
