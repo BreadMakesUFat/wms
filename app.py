@@ -59,7 +59,7 @@ def route_barcode_bookings():
     articleDescriptions = [None] * n
 
     for i,v in enumerate(data["bons"]):
-        if (v.startswith("AT")):
+        if v.startswith("AT") or v.endswith("N") or v.endswith("U") or v.endswith("B"):
             articleIDs[i] = v 
         else:
             bons[i] = v
@@ -255,7 +255,7 @@ def route_new_delivery():
         
         # parse id 
         id = data["id"]
-        if id.startswith("AT"):
+        if v.startswith("AT") or v.endswith("N") or v.endswith("U") or v.endswith("B"):
             data["articleID"] = id 
             data["bon"] = None 
         else:
